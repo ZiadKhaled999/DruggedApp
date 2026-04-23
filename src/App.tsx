@@ -108,14 +108,14 @@ export default function App() {
         <div className="max-w-[1400px] mx-auto px-6 md:px-12 mt-16 md:mt-24 relative z-10 w-full mb-16">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {[
-              { src: "/1_welcome.png", alt: "Welcome Screen" },
-              { src: "/2_symptoms.png", alt: "Symptoms Screen" },
-              { src: "/3_search.png", alt: "Search Screen" },
-              { src: "/4_search_active.png", alt: "Search Results" },
-              { src: "/5_search_list.png", alt: "Search List" },
-              { src: "/6_details.png", alt: "Drug Details" },
-              { src: "/7_report.png", alt: "Report Issue" },
-              { src: "/8_extra.png", alt: "Additional Screenshot" }
+              { src: "/1_welcome.jpg", alt: "Welcome Screen" },
+              { src: "/2_symptoms.jpg", alt: "Symptoms Screen" },
+              { src: "/3_search.jpg", alt: "Search Screen" },
+              { src: "/4_search_active.jpg", alt: "Search Results" },
+              { src: "/5_search_list.jpg", alt: "Search List" },
+              { src: "/6_details.jpg", alt: "Drug Details" },
+              { src: "/7_report.jpg", alt: "Report Issue" },
+              { src: "/8_extra.jpg", alt: "Additional Screenshot" }
             ].map((img, i) => (
               <div 
                 key={i} 
