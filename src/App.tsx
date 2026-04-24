@@ -24,27 +24,26 @@ const StaticPhoneMockup = ({ src, alt, className = "" }: { src: string, alt: str
 // --- Main Page Component ---
 
 export default function App() {
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
-  const handleDownload = async () => {
-    if (isDownloading) return;
-    setIsDownloading(true);
-
+  const trackAndDownload = async (method: 'mediafire' | 'drive', url: string) => {
     try {
       // Secretly track the download click in Firebase without disturbing the user
       await addDoc(collection(db, 'download_clicks'), {
         clickedAt: serverTimestamp(),
-        userAgent: navigator.userAgent
+        userAgent: navigator.userAgent,
+        method
       });
     } catch (error) {
       console.warn("Analytics error (non-blocking): ", error);
     }
 
-    setTimeout(() => {
-      setIsDownloading(false);
-      // Direct download link generated from Google Drive ID
-      window.location.href = 'https://drive.google.com/uc?export=download&id=1j461o46j6Rd7BZxurd21nWilBXEvjcvo';
-    }, 800);
+    if (method === 'drive') {
+      alert("If the file doesn't found in your file manager, you're 90% likely to find it in your Google Drive app.");
+    }
+    
+    window.location.href = url;
+    setIsDownloadModalOpen(false);
   };
 
   return (
@@ -64,7 +63,7 @@ export default function App() {
           <a href="#features" className="hover:text-gray-900 transition-colors">Capabilities</a>
           <a href="#security" className="hover:text-gray-900 transition-colors">Safety</a>
           <button 
-            onClick={handleDownload} 
+            onClick={() => setIsDownloadModalOpen(true)} 
             className="bg-gray-900 text-white px-8 py-3.5 rounded-2xl text-[13px] font-bold hover:bg-gray-800 transition-all hover:scale-105 active:scale-95"
           >
             Get Started
@@ -90,12 +89,11 @@ export default function App() {
             
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-6">
               <button 
-                onClick={handleDownload}
-                disabled={isDownloading}
+                onClick={() => setIsDownloadModalOpen(true)}
                 className="bg-[#27ae60] text-white px-12 py-5 rounded-[22px] text-[17px] font-bold hover:bg-[#219653] shadow-2xl shadow-[#27ae60]/40 transition-all active:scale-95 flex items-center justify-center gap-3 group"
               >
-                {isDownloading ? 'Initializing...' : 'Get Started Now'}
-                {!isDownloading && <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />}
+                Get Started Now
+                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </button>
               <div className="flex items-center justify-center gap-4 px-6 text-gray-400">
                 <span className="text-[14px] font-bold">Trusted by more than 5 doctors and 3K patients</span>
@@ -253,6 +251,59 @@ export default function App() {
           </div>
         </div>
       </footer>
+      {/* Modal Overlay */}
+      {isDownloadModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="bg-white rounded-[32px] w-full max-w-md p-8 relative overflow-hidden shadow-2xl"
+          >
+            <button 
+              onClick={() => setIsDownloadModalOpen(false)}
+              className="absolute top-6 right-6 p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-500 transition-colors"
+            >
+              <X size={20} />
+            </button>
+            
+            <div className="w-16 h-16 bg-[#27ae60]/10 rounded-2xl flex items-center justify-center mb-6">
+              <ArrowRight size={32} className="text-[#27ae60]" />
+            </div>
+            
+            <h3 className="text-2xl font-black text-gray-900 mb-2">Choose Download Method</h3>
+            <p className="text-gray-500 font-medium text-sm mb-8">
+              Select how you would like to download the DruggedApp APK.
+            </p>
+
+            <div className="space-y-4">
+              <button 
+                onClick={() => trackAndDownload('mediafire', 'https://www.mediafire.com/file/6obdh7rs0ytkjuk/DruggedApp.apk/file')}
+                className="w-full bg-[#27ae60] text-white px-6 py-4 rounded-2xl font-bold flex flex-col items-start gap-1 hover:bg-[#219653] transition-colors shadow-lg shadow-[#27ae60]/20"
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-lg">Direct Download</span>
+                  <ArrowRight size={20} />
+                </div>
+                <span className="text-white/80 font-medium text-sm">Recommended • Installs directly to files</span>
+              </button>
+
+              <button 
+                onClick={() => trackAndDownload('drive', 'https://drive.google.com/uc?export=download&id=1j461o46j6Rd7BZxurd21nWilBXEvjcvo')}
+                className="w-full bg-gray-100 text-gray-900 px-6 py-4 rounded-2xl font-bold flex flex-col items-start gap-1 hover:bg-gray-200 transition-colors border max-w-full"
+              >
+                <span className="text-lg">Google Drive</span>
+                <span className="text-gray-500 font-medium text-[13px] text-left leading-snug">
+                  May save to your Drive app instead of the File Manager.
+                </span>
+              </button>
+            </div>
+            
+            <p className="text-center text-xs text-gray-400 font-medium mt-6">
+              Requires Android 8.0 or completely newer.
+            </p>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
